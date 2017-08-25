@@ -1,5 +1,8 @@
 ---
 - hosts: localhost
+  vars:
+    aws_config_dir: "{{ansible_env.HOME}}/.aws"
+    bash_profile: "{{ansible_env.HOME}}/.bash_profile"
   tasks:
     - name: installs dot config files
       file:
@@ -44,7 +47,7 @@
     - name: updates pip packages
       pip:
         name: "{{item}}"
-        extra_args: "--user"
+        extra_args: '--user'
         state: latest
       with_items:
         - pip
@@ -52,11 +55,33 @@
       tags:
       - skip_ansible_lint
     ###
-    # modifications
+    # aws config
+    ###
+    - name: aws has been configured?
+      stat: path="{{aws_config_dir}}"
+      register: aws_config_done
+    - name: creates basic aws config
+      command: aws configure
+      when: aws_config_done.stat.exists == False
+    - name: enables preview section
+      lineinfile:
+        path: "{{aws_config_dir}}/config"
+        regexp: '^\[preview\]$'
+        line: '[preview]'
+        state: present
+    - name: adds cloudfront into preview section
+      lineinfile:
+        path: "{{aws_config_dir}}/config"
+        regexp: '^cloudfront = '
+        line: 'cloudfront = true'
+        insertafter: '^\[preview\]$'
+        state: present
+    ###
+    # bash modifications
     ###
     - name: enables chruby .bash_profile
       lineinfile:
-        path: "{{ansible_env.HOME}}/.bash_profile"
+        path: "{{bash_profile}}"
         regexp: '^source .*/chruby/{{item}}.sh$'
         line: 'source /usr/local/opt/chruby/share/chruby/{{item}}.sh'
       with_items:
@@ -64,7 +89,7 @@
          - auto
     - name: adds git branch into prompt
       blockinfile:
-        path: "{{ansible_env.HOME}}/.bash_profile"
+        path: "{{bash_profile}}"
         state: present
         content: |
           git_version=$(git --version | cut -f 3 -d" ")
