@@ -1,0 +1,59 @@
+---
+- hosts: localhost
+  tasks:
+    - name: installs dot config files
+      file:
+        dest: "{{ansible_env.HOME}}/.{{item}}"
+        src: "{{ansible_env.PWD}}/files/{{item}}"
+        state: link
+      with_items:
+        - vimrc
+    ###
+    # Homebrew
+    ###
+    - name: updates homebrew
+      homebrew: update_homebrew=yes
+    - name: verifies that brew packages are present
+      homebrew:
+        name: "{{item}}"
+        state: present
+      with_items:
+        - chruby
+        - pwgen
+    - name: updates brew packages
+      homebrew:
+        name: "{{item}}"
+        state: latest
+      with_items:
+        - ansible-lint
+        - awscli
+        - ruby-install
+        - shellcheck
+        - tig
+        - wget
+      tags:
+      - skip_ansible_lint
+    ###
+    # pip
+    ###
+    - name: updates pip packages
+      pip:
+        name: "{{item}}"
+        extra_args: "--user"
+        state: latest
+      with_items:
+        - pip
+        - boto3
+      tags:
+      - skip_ansible_lint
+    ###
+    # modifications
+    ###
+    - name: modifies .bash_profile
+      lineinfile:
+        path: "{{ansible_env.HOME}}/.bash_profile"
+        regexp: '^source .*/chruby/{{item}}.sh$'
+        line: 'source /usr/local/opt/chruby/share/chruby/{{item}}.sh'
+      with_items:
+         - chruby
+         - auto

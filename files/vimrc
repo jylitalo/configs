@@ -1,0 +1,7 @@
+set expandtab
+set laststatus=2
+set number
+set statusline+=%F\ %l\:%c
+syntax on
+let g:terraform_align=1
+
