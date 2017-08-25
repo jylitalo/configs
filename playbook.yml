@@ -19,6 +19,7 @@
         state: present
       with_items:
         - chruby
+        - git
         - pwgen
     - name: updates brew packages
       homebrew:
@@ -49,7 +50,7 @@
     ###
     # modifications
     ###
-    - name: modifies .bash_profile
+    - name: enables chruby .bash_profile
       lineinfile:
         path: "{{ansible_env.HOME}}/.bash_profile"
         regexp: '^source .*/chruby/{{item}}.sh$'
@@ -57,3 +58,14 @@
       with_items:
          - chruby
          - auto
+    - name: adds git branch into prompt
+      blockinfile:
+        path: "{{ansible_env.HOME}}/.bash_profile"
+        state: present
+        content: |
+          git_version=$(git --version | cut -f 3 -d" ")
+          git_prompt="/usr/local/Cellar/git/${git_version}/etc/bash_completion.d/git-prompt.sh"
+          if [ -f "$git_prompt" ]; then
+            source "$git_prompt"
+            export PS1="\h:\W \u\$(__git_ps1 ' \[\033[0;32m\](%s)\[\033[0;30m\]') \$ "
+          fi
