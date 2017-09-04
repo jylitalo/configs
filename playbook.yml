@@ -3,6 +3,7 @@
   vars:
     aws_config_dir: "{{ansible_env.HOME}}/.aws"
     bash_profile: "{{ansible_env.HOME}}/.bash_profile"
+    bashrc: "{{ansible_env.HOME}}/.bashrc"
   tasks:
     - name: installs dot config files
       file:
@@ -31,6 +32,7 @@
       with_items:
         - ansible-lint
         - awscli
+        - bash-completion
         - ruby-install
         - shellcheck
         - tig
@@ -79,6 +81,11 @@
     ###
     # bash modifications
     ###
+    - name: ~/.bashrc should exist
+      copy:
+        src: "/usr/local/etc/bash_completion.d/git-prompt.sh"
+        dest: "{{bashrc}}"
+        mode: 0755
     - name: enables chruby .bash_profile
       lineinfile:
         path: "{{bash_profile}}"
@@ -92,9 +99,8 @@
         path: "{{bash_profile}}"
         state: present
         content: |
-          git_version=$(git --version | cut -f 3 -d" ")
-          git_prompt="/usr/local/Cellar/git/${git_version}/etc/bash_completion.d/git-prompt.sh"
-          if [ -f "$git_prompt" ]; then
-            source "$git_prompt"
+          if [ -f "${HOME}/.bashrc" ]; then
+            # shellcheck source=/dev/null
+            source "${HOME}/.bashrc"
             export PS1="\h:\W \u\$(__git_ps1 ' \[\033[0;32m\](%s)\[\033[0;30m\]') \$ "
           fi
