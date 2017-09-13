@@ -54,6 +54,7 @@
       with_items:
         - pip
         - boto3
+        - pylint
       tags:
       - skip_ansible_lint
     ###
