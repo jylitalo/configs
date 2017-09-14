@@ -111,6 +111,26 @@
             export GIT_PS1_SHOWCOLORHINTS=true
             export PROMPT_COMMAND='__git_ps1 "\h:\w" " \\\$ "'
           fi
+
+    ###
+    # git
+    ###
+    - name: adds global .gitignore
+      file:
+        src: "{{playbook_dir}}/files/gitignore"
+        dest: "{{ansible_env.HOME}}/.gitignore"
+        state: link
+    - name: adds block into .gitconfig
+      blockinfile:
+        path: "{{ansible_env.HOME}}/.gitconfig"
+        state: present
+        content: |
+          [core]
+              editor = /usr/bin/vim
+              excludesfile = /Users/jylitalo/.gitignore
+          [push]
+              default = simple
+
     ###
     # vim
     ###
@@ -130,7 +150,7 @@
       - skip_ansible_lint
     - name: installs dot config files
       file:
-        src: "{{ansible_env.PWD}}/files/{{item.src}}"
+        src: "{{playbook_dir}}/files/{{item.src}}"
         dest: "{{ansible_env.HOME}}/.{{item.dest}}"
         state: link
       with_items:
