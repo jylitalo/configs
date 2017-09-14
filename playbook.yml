@@ -105,6 +105,7 @@
         path: "{{bash_profile}}"
         state: present
         content: |
+          export PATH=$PATH:$HOME/Library/Python/2.7/bin
           if [ -f "${HOME}/.bashrc" ]; then
             # shellcheck source=/dev/null
             source "${HOME}/.bashrc"
