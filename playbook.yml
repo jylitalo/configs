@@ -1,5 +1,6 @@
 ---
 - hosts: localhost
+  connection: local
   vars:
     aws_config_dir: "{{ansible_env.HOME}}/.aws"
     bash_profile: "{{ansible_env.HOME}}/.bash_profile"
@@ -15,21 +16,21 @@
         name: "{{item}}"
         state: present
       with_items:
-        - chruby
-        - git
-        - pwgen
+      - chruby
+      - git
+      - pwgen
     - name: updates brew packages
       homebrew:
         name: "{{item}}"
         state: latest
       with_items:
-        - ansible-lint
-        - awscli
-        - bash-completion
-        - ruby-install
-        - shellcheck
-        - tig
-        - wget
+      - ansible-lint
+      - awscli
+      - bash-completion
+      - ruby-install
+      - shellcheck
+      - tig
+      - wget
       tags:
       - skip_ansible_lint
     - name: homebrew cleanup
@@ -45,9 +46,9 @@
         extra_args: '--user'
         state: latest
       with_items:
-        - pip
-        - boto3
-        - pylint
+      - pip
+      - boto3
+      - pylint
       tags:
       - skip_ansible_lint
     ###
@@ -58,7 +59,7 @@
         name: "{{item}}"
         state: latest
       with_items:
-        - travis-lint
+      - travis-lint
       tags:
       - skip_ansible_lint
     ###
@@ -97,8 +98,8 @@
         regexp: '^source .*/chruby/{{item}}.sh$'
         line: 'source /usr/local/opt/chruby/share/chruby/{{item}}.sh'
       with_items:
-         - chruby
-         - auto
+      - chruby
+      - auto
     - name: adds git branch into prompt
       blockinfile:
         path: "{{bash_profile}}"
@@ -114,23 +115,25 @@
     # vim
     ###
     - name: create dirs for synaptic
-      file: 
+      file:
         path: "{{ansible_env.HOME}}/.vim/{{item}}"
         state: directory
       with_items:
       - autoload
       - bundle
-    - name: installs dot config files
-      file:
-        src: "{{ansible_env.PWD}}/files/{{item}}"
-        dest: "{{ansible_env.HOME}}/.{{item}}"
-        state: link
-      with_items:
-      - vimrc
-      - vim/autoload/pathogen.vim
     - name: install syntastic
       git:
         repo: "https://github.com/vim-syntastic/syntastic.git"
         dest: "{{ansible_env.HOME}}/.vim/bundle/syntastic"
         depth: 1
+      tags:
+      - skip_ansible_lint
+    - name: installs dot config files
+      file:
+        src: "{{ansible_env.PWD}}/files/{{item.src}}"
+        dest: "{{ansible_env.HOME}}/.{{item.dest}}"
+        state: link
+      with_items:
+      - {src: "vimrc", dest: "vimrc"}
+      - {src: "vim/pathogen.vim", dest: "vim/autoload/pathogen.vim"}
 
