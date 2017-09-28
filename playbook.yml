@@ -59,6 +59,7 @@
         name: "{{item}}"
         state: latest
       with_items:
+      - rubycop
       - travis-lint
       tags:
       - skip_ansible_lint
