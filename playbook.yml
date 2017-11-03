@@ -6,6 +6,9 @@
     bash_profile: "{{ansible_env.HOME}}/.bash_profile"
     bashrc: "{{ansible_env.HOME}}/.bashrc"
   tasks:
+    - name: install pip
+      shell: easy_install pip
+      become: yes
     ###
     # Homebrew
     ###
@@ -47,8 +50,10 @@
         state: latest
       with_items:
       - pip
+      - apache-libcloud
       - boto3
       - pylint
+      - pycrypto
       tags:
       - skip_ansible_lint
     ###
@@ -59,7 +64,7 @@
         name: "{{item}}"
         state: latest
       with_items:
-      - rubycop
+      - rubocop
       - travis-lint
       tags:
       - skip_ansible_lint
