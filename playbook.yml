@@ -6,9 +6,16 @@
     bash_profile: "{{ansible_env.HOME}}/.bash_profile"
     bashrc: "{{ansible_env.HOME}}/.bashrc"
   tasks:
+    ###
+    # pip installed
+    ###
+    - name: pip has been installed?
+      stat: path=/usr/local/bin/pip
+      register: pip_command
     - name: install pip
       shell: easy_install pip
       become: yes
+      when: not pip_command.stat.exists
     ###
     # Homebrew
     ###
@@ -41,7 +48,7 @@
       tags:
       - skip_ansible_lint
     ###
-    # pip
+    # pip packages
     ###
     - name: updates pip packages
       pip:
@@ -57,6 +64,16 @@
       tags:
       - skip_ansible_lint
     ###
+    # ruby
+    ###
+    - name: ruby 2.4.1 installed?
+      stat: path="{{ansible_env.HOME}}/.rubies/ruby-2.4.1"
+      register: ruby_installed
+    - name: install ruby 2.4.1
+      command: ruby-install ruby 2.4.1
+      when: not ruby_installed.stat.exists
+
+    ###
     # gem
     ###
     - name: updates gem packages
@@ -64,6 +81,7 @@
         name: "{{item}}"
         state: latest
       with_items:
+      - bundler
       - rubocop
       - travis-lint
       tags:
@@ -138,16 +156,6 @@
               excludesfile = /Users/jylitalo/.gitignore
           [push]
               default = simple
-
-    ###
-    # ruby
-    ###
-    - name: ruby 2.4.1 installed?
-      stat: path="{{ansible_env.HOME}}/.rubies/ruby-2.4.1"
-      register: ruby_installed
-    - name: install ruby 2.4.1
-      command: ruby-install ruby 2.4.1
-      when: not ruby_installed.stat.exists
 
     ###
     # vim
