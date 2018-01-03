@@ -18,6 +18,14 @@
       when: not pip_command.stat.exists
       tags:
       - skip_ansible_lint
+    - name: pip.conf for pip
+      copy:
+        src: pip.conf
+        dest: "{{ansible_env.HOME}}/.pip/pip.conf"
+    - name: pydistutils.cfg for pip
+      copy:
+        src: pydistutils.cfg
+        dest: "{{ansible_env.HOME}}/.pydistutils.cfg"
     ###
     # Homebrew
     ###
