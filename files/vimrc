@@ -3,6 +3,7 @@ set laststatus=2
 set number
 set statusline+=%F\ %l\:%c
 set shiftwidth=2
+set encoding=utf-8
 syntax on
 let g:terraform_align=1
 execute pathogen#infect()
