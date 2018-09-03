@@ -38,6 +38,7 @@
       with_items:
       - chruby
       - git
+      - gnupg
       - pwgen
     - name: updates brew packages
       homebrew:
@@ -140,8 +141,8 @@
         path: "{{bash_profile}}"
         state: present
         content: |
-          chruby 2.4.1
-          export PATH=$PATH:$HOME/Library/Python/2.7/bin
+          chruby 2.5.0
+          export PATH=$PATH:$HOME/Library/Python/3.7/bin
           if [ -f "${HOME}/.bashrc" ]; then
             # shellcheck source=/dev/null
             source "${HOME}/.bashrc"
@@ -193,4 +194,11 @@
       with_items:
       - {src: "vimrc", dest: "vimrc"}
       - {src: "vim/pathogen.vim", dest: "vim/autoload/pathogen.vim"}
-
+    ###
+    # gnupg
+    ###
+    - name: uncomment chartset from gpg config
+      lineinfile:
+        dest: "{{ansible_env.HOME}}/.gnupg/gpg.conf"
+        regexp: '^#.*charset utf-8$'
+        line: 'charset utf-8'
