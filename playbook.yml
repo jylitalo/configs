@@ -33,25 +33,12 @@
       homebrew: update_homebrew=yes
     - name: verifies that brew packages are present
       homebrew:
-        name: "{{item}}"
+        name: ['chruby', 'git', 'gnupg', 'pwgen']
         state: present
-      with_items:
-      - chruby
-      - git
-      - gnupg
-      - pwgen
     - name: updates brew packages
       homebrew:
-        name: "{{item}}"
+        name: ['ansible-lint', 'awscli', 'bash-completion', 'ruby-install', 'shellcheck', 'tig', 'wget']
         state: latest
-      with_items:
-      - ansible-lint
-      - awscli
-      - bash-completion
-      - ruby-install
-      - shellcheck
-      - tig
-      - wget
       tags:
       - skip_ansible_lint
     - name: homebrew cleanup
@@ -63,25 +50,19 @@
     ###
     - name: updates pip packages
       pip:
-        name: "{{item}}"
+        name: ['pip', 'apache-libcloud', 'boto3', 'pylint', 'pycrypto']
         extra_args: '--user'
         state: latest
-      with_items:
-      - pip
-      - apache-libcloud
-      - boto3
-      - pylint
-      - pycrypto
       tags:
       - skip_ansible_lint
     ###
     # ruby
     ###
-    - name: ruby 2.4.1 installed?
-      stat: path="{{ansible_env.HOME}}/.rubies/ruby-2.4.1"
+    - name: ruby 2.6.2 installed?
+      stat: path="{{ansible_env.HOME}}/.rubies/ruby-2.6.2"
       register: ruby_installed
-    - name: install ruby 2.4.1
-      command: ruby-install ruby 2.4.1
+    - name: install ruby 2.6.2
+      command: ruby-install ruby 2.6.2
       when: not ruby_installed.stat.exists
 
     ###
@@ -141,7 +122,10 @@
         path: "{{bash_profile}}"
         state: present
         content: |
-          chruby 2.5.0
+          chruby 2.6.2
+          chtf 0.11.13
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+          export ANSIBLE_PIPELINING=YES
           export PATH=$PATH:$HOME/Library/Python/3.7/bin
           if [ -f "${HOME}/.bashrc" ]; then
             # shellcheck source=/dev/null
