@@ -1,0 +1,99 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    aws_config_dir: "{{ansible_env.HOME}}/.aws"
+    bash_profile: "{{ansible_env.HOME}}/.bash_profile"
+    bashrc: "{{ansible_env.HOME}}/.bashrc"
+    zshrc: "{{ansible_env.HOME}}/.zshrc"
+  tasks:
+    ###
+    # Homebrew
+    ###
+    - name: ensure that Yleisradio/terraforms has been tapped
+      command: brew tap Yleisradio/terraforms
+    - name: updates homebrew
+      homebrew: update_homebrew=yes
+    - name: verifies that brew packages are present
+      homebrew:
+        name: ['chruby', 'chtf', 'git', 'gnupg']
+        state: present
+    - name: updates brew packages
+      homebrew:
+        name: ['ansible-lint', 'awscli', 'bash-completion', 'ruby-install', 'shellcheck']
+        state: latest
+      tags:
+      - skip_ansible_lint
+    - name: homebrew cleanup
+      command: brew cleanup
+      tags:
+      - skip_ansible_lint
+    ###
+    # ruby
+    ###
+    - name: ruby 2.6.3 installed?
+      stat: path="{{ansible_env.HOME}}/.rubies/ruby-2.6.3"
+      register: ruby_installed
+    - name: install ruby 2.6.3
+      command: ruby-install ruby 2.6.3
+      when: not ruby_installed.stat.exists
+
+    ###
+    # bash modifications
+    ###
+    - name: bash_profile should exist
+      file:
+        path: "{{bash_profile}}"
+        state: touch
+    - name: Content for bash_profile
+      blockinfile:
+        path: "{{bash_profile}}"
+        state: present
+        content: |
+          source /usr/local/opt/chruby/share/chruby/chruby.sh
+          source /usr/local/opt/chruby/share/chruby/auto.sh
+          chruby 2.6.3
+          source /usr/local/opt/chtf/share/chtf/chtf.sh
+          chtf 0.12.2
+          export TF_AWS_ROLE=ops
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+          export ANSIBLE_PIPELINING=YES
+          export PATH=$PATH:$HOME/Library/Python/3.7/bin:$HOME/Yleisradio/yle-aws-tools/bin
+          export LC_ALL=en_US.UTF-8
+    ###
+    # zsh modifications
+    ###
+    - name: zshrc should exist
+      file:
+        path: "{{zshrc}}"
+        state: touch
+    - name: Content for zshrc
+      blockinfile:
+        path: "{{zshrc}}"
+        state: present
+        content: |
+          source /usr/local/opt/chruby/share/chruby/chruby.sh
+          source /usr/local/opt/chruby/share/chruby/auto.sh
+          chruby 2.6.3
+          source /usr/local/opt/chtf/share/chtf/chtf.sh
+          chtf 0.12.2
+          export TF_AWS_ROLE=ops
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+          export ANSIBLE_PIPELINING=YES
+          export PATH=$PATH:$HOME/Library/Python/3.7/bin:$HOME/Yleisradio/yle-aws-tools/bin
+          export LC_ALL=en_US.UTF-8
+          setopt prompt_subst
+          autoload -Uz vcs_info
+          zstyle ':vcs_info:*' actionformats \
+            '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
+          zstyle ':vcs_info:*' formats       \
+            '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{5}]%f '
+          zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+          zstyle ':vcs_info:*' enable git
+          vcs_info_wrapper() {
+            vcs_info
+            if [ -n "$vcs_info_msg_0_" ]; then
+              echo "%{$fg[grey]%}${vcs_info_msg_0_}%{$reset_color%}$del"
+            fi
+          }
+          RPROMPT=$'$(vcs_info_wrapper)'

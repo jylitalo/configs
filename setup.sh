@@ -11,4 +11,7 @@ fi
 DIR=$(dirname "$0")
 cd "$DIR" || exit 2
 rm -f playbook.retry
-ansible-playbook -i localhost, playbook.yml --ask-become-pass
+ansible-playbook -i localhost, bootstrap.yml
+. ~/.bash_profile
+ansible-playbook -i localhost, playbook.yml 
+
