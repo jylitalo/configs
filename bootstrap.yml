@@ -13,6 +13,7 @@
     - name: updates gem packages
       gem:
         name: "{{item}}"
+        executable: /usr/bin/gem
         state: latest
       with_items:
       - rubocop
