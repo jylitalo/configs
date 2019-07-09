@@ -8,6 +8,16 @@
     zshrc: "{{ansible_env.HOME}}/.zshrc"
   tasks:
     ###
+    # gems with default ruby
+    ###
+    - name: updates gem packages
+      gem:
+        name: "{{item}}"
+        state: latest
+      with_items:
+      - rubocop
+      become: yes
+    ###
     # Homebrew
     ###
     - name: ensure that Yleisradio/terraforms has been tapped
@@ -96,3 +106,4 @@
             fi
           }
           RPROMPT=$'$(vcs_info_wrapper)'
+          PROMPT="[%m:%~]%# "
