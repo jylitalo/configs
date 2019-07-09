@@ -16,6 +16,7 @@
       with_items:
       - bundler
       - rubocop
+      - travis
       - travis-lint
       tags:
       - skip_ansible_lint
