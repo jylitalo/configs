@@ -50,3 +50,14 @@
         dest: "{{ansible_env.HOME}}/.gnupg/gpg.conf"
         regexp: '^#.*charset utf-8$'
         line: 'charset utf-8'
+    ###
+    # pip
+    ###
+    - name: updates pip packages
+      pip:
+        name:
+        - boto3
+        - pylint
+        executable: pip3
+        extra_args: --user
+
