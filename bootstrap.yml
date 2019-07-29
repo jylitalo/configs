@@ -65,7 +65,7 @@
           source /usr/local/opt/chruby/share/chruby/auto.sh
           chruby 2.6.3
           source /usr/local/opt/chtf/share/chtf/chtf.sh
-          chtf 0.12.2
+          chtf 0.12.5
           export TF_AWS_ROLE=ops
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           export ANSIBLE_PIPELINING=YES
@@ -87,7 +87,7 @@
           source /usr/local/opt/chruby/share/chruby/auto.sh
           chruby 2.6.3
           source /usr/local/opt/chtf/share/chtf/chtf.sh
-          chtf 0.12.2
+          chtf 0.12.5
           export TF_AWS_ROLE=ops
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           export ANSIBLE_PIPELINING=YES
